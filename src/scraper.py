@@ -32,7 +32,7 @@ class OddsPortal:
             # Save the updated DataFrame to the Excel file
             df_existing.to_excel(excel_path, index=False, sheet_name=sheet_name)
             print("Data appended successfully.")
-            
+
     def scrape(self, ori_url):
         try:
             # Open Original URL
@@ -102,6 +102,8 @@ class OddsPortal:
                     
                     meta_key = '/html/head/meta[11]'
                     meta_key_value = self.driver.find_element(By.XPATH, meta_key).get_attribute('content')
+
+                    ### Desired number of extracted games
                     if counter == 7:
                         break
                     counter += 1
