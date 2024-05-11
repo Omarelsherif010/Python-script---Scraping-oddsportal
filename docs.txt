@@ -1,0 +1,22 @@
+Job details
+Python script - Scraping
+
+I am looking for a python developer who will create a script to scrap the website oddsportal.
+
+Pages look like this: https://www.oddsportal.com/tennis/argentina/atp-buenos-aires/results/
+
+I need a script that executes the following tasks:
+1. Loop through a list of pages / Go to the page: https://www.oddsportal.com/tennis/argentina/atp-buenos-aires/results/
+2. Open every game in the page, for instance: https://www.oddsportal.com/tennis/argentina/atp-buenos-aires/meligeni-rodrigues-alves-felipe-navone-mariano-WbNbqqTg/
+3. Extract all data in the game page (see the csv file for the extraction format, it needs to be exactly like that)
+
+
+-You need to make sure to handle every possible xpath. There are variations from one tournament or game page to another. Depending on one page or another, the xpath might change to open the game page or to scrap the game page data.
+
+-Need a headless set-up
+
+-Need a scraper that processes scraping gast (I have more than 40,000 pages to scrap). Parallel scraping or anything similar can be considered 
+
+
+-----------
+
