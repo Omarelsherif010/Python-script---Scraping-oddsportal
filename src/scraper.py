@@ -104,10 +104,10 @@ class OddsPortal:
                     meta_key_value = self.driver.find_element(By.XPATH, meta_key).get_attribute('content')
 
                     ### Desired number of extracted games
-                    if counter == 7:
+                    if counter == 10:
                         break
                     counter += 1
-                    # print(f'Original URL: {}')
+                    print(f'Original_URL: {ori_url}')
                     print(f'Page URL: {page}')
                     print(f'Odd1: {odd1_value}')
                     print(f'Odd2: {odd2_value}')
@@ -121,6 +121,7 @@ class OddsPortal:
                     print(f"Counter: {counter}")
 
                     row_data = {
+                        'Original_URL': ori_url,
                         'Page_URL': page,
                         'Bookmaker': bookmark,
                         'Odd1': odd1_value,
