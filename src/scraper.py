@@ -2,6 +2,7 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 import time
+import pandas as pd
 
 class OddsPortal:
     
@@ -14,14 +15,31 @@ class OddsPortal:
             self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
             time.sleep(2)  # Wait for more games to load
 
-    
+    def append_if_not_duplicate(self, row_data, excel_path, sheet_name='Sheet1'):
+        # Try to read the existing Excel file
+        try:
+            df_existing = pd.read_excel(excel_path, sheet_name=sheet_name)
+        except FileNotFoundError:
+            # If the file does not exist, create a new DataFrame
+            df_existing = pd.DataFrame(columns=row_data.keys())
+        
+        # Check if the 'Page_URL' is already in the DataFrame
+        if not df_existing[df_existing['Page_URL'] == row_data['Page_URL']].empty:
+            print("Data for this Page_URL already exists in the Excel sheet. Skipping duplicate.")
+        else:
+            # Append the new row to the DataFrame
+            df_existing = pd.concat([df_existing, pd.DataFrame([row_data])], ignore_index=True)
+            # Save the updated DataFrame to the Excel file
+            df_existing.to_excel(excel_path, index=False, sheet_name=sheet_name)
+            print("Data appended successfully.")
+
     def scrape(self, ori_url):
         try:
             # Open Original URL
             ori_url = "https://www.oddsportal.com/tennis/argentina/atp-buenos-aires/results/"
             self.driver.get(ori_url)
             # Wait for the page to load
-            time.sleep(10)
+            time.sleep(5)
             
             self.scroll_to_load_games()
 
@@ -33,7 +51,7 @@ class OddsPortal:
             for orig_result in Orig_URLs:
                 o_href = orig_result.get_attribute('href')
                 # print(o_href)
-                Orig_urls.append(o_href)
+                Orig_list.append(o_href)
             print(f'Original List: {Orig_list}')
             print(f'lenght of Orig_list : {len(Orig_list)}')
 
@@ -43,22 +61,21 @@ class OddsPortal:
             pages_list = []
             for page in pages_url:
                 p_href = page.get_attribute("href")
-                print(f'p_href: {p_href}')
+                # print(f'p_href: {p_href}')
                 pages_list.append(p_href)
             print(f'pages_list : {pages_list}')
             print(f'lenght of pages_list : {len(pages_list)}')
             
             counter = 0
 
-            scraped_data = []
+            # scraped_data = []
 
             for page in pages_list:
                 self.driver.get(page)
-                time.sleep(10)
+                time.sleep(5)
                 try:
                     bookmark_path = '/html/body/div[1]/div[1]/div[1]/div/main/div[3]/div[2]/div[2]/div[1]/div/div[2]/div[1]/a[2]/p'
                     bookmark = self.driver.find_element(By.XPATH, bookmark_path).text
-                    print(f'Bookmark: {bookmark}')
 
                     odd1 = '/html/body/div[1]/div[1]/div[1]/div/main/div[3]/div[2]/div[2]/div[1]/div/div[2]/div[2]/div/div/p'
                     odd2 = '/html/body/div[1]/div[1]/div[1]/div/main/div[3]/div[2]/div[2]/div[1]/div/div[2]/div[3]/div/div/p'
@@ -86,6 +103,9 @@ class OddsPortal:
                     meta_key = '/html/head/meta[11]'
                     meta_key_value = self.driver.find_element(By.XPATH, meta_key).get_attribute('content')
 
+                    ### Desired number of extracted games
+                    if counter == 7:
+                        break
                     counter += 1
                     # print(f'Original URL: {}')
                     print(f'Page URL: {page}')
@@ -100,7 +120,7 @@ class OddsPortal:
                     print(f'Meta Keywords: {meta_key_value}')
                     print(f"Counter: {counter}")
 
-                    scraped_data.append({
+                    row_data = {
                         'Page_URL': page,
                         'Bookmaker': bookmark,
                         'Odd1': odd1_value,
@@ -113,12 +133,13 @@ class OddsPortal:
                         'Final_Result': final_result_value,
                         'p1': p1_value,
                         'p2': p2_value
-                    })
+                    }
+                    self.append_if_not_duplicate(row_data, 'scraped_data.xlsx')
                 except Exception:
                     continue
             
-            df = pd.DataFrame(scraped_data)
-            df.to_excel('scraped_data.xlsx', index=False)
+            # df = pd.DataFrame(scraped_data)
+            # df.to_excel('scraped_data.xlsx', index=False)
 
 
  
